@@ -1,5 +1,6 @@
-package com.geovane.transacaofinanceira.domain.model;
+package com.geovane.transacaofinanceira.model;
 
+import com.geovane.transacaofinanceira.domain.model.Conta;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import java.math.BigDecimal;

@@ -6,8 +6,7 @@ import java.util.Optional;
 
 public interface ContaRepository {
 
-    Optional <Conta> buscarPorId(long id); // Mudança aqui
-
+    Optional <Conta> buscarPorId(long id);
 
     void salvar(Conta conta);
 
