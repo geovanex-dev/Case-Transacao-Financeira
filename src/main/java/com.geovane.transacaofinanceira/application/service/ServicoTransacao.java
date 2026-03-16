@@ -20,13 +20,12 @@ public class ServicoTransacao implements ExecutarTransacaoUseCase {
     @Override
     public void executar(Transacao transacao) {
 
-        Conta origem = contaRepository.buscarPorId(transacao.getContaOrigem());
-        Conta destino = contaRepository.buscarPorId(transacao.getContaDestino());
+        Conta origem = contaRepository.buscarPorId(transacao.getContaOrigem())
+                .orElseThrow(() -> new RuntimeException("Conta origem não encontrada: " + transacao.getContaOrigem()));
 
-        if (origem == null || destino == null) {
-            log.warn("Transação {} cancelada: conta inexistente", transacao.getId());
-            return;
-        }
+        Conta destino = contaRepository.buscarPorId(transacao.getContaDestino())
+                .orElseThrow(() -> new RuntimeException("Conta destino não encontrada: " + transacao.getContaDestino()));
+
 
         Conta primeira = origem.getId() < destino.getId() ? origem : destino;
         Conta segunda = origem.getId() < destino.getId() ? destino : origem;
@@ -34,11 +33,10 @@ public class ServicoTransacao implements ExecutarTransacaoUseCase {
         synchronized (primeira) {
             synchronized (segunda) {
 
-                if (origem.getSaldo() < transacao.getValor()) {
+                if (origem.getSaldo().compareTo(transacao.getValor()) < 0) {
                     log.warn("Transação {} cancelada por falta de saldo", transacao.getId());
                     return;
                 }
-
                 origem.debitar(transacao.getValor());
                 destino.creditar(transacao.getValor());
 
