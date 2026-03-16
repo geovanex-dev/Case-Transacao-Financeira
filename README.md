@@ -1,10 +1,6 @@
-# 💸 Transação Financeira
+# Transação Financeira - Case Técnico
 
-![Java](https://img.shields.io/badge/java-%23ED8B00.svg?style=for-the-badge&logo=openjdk&logoColor=white)
-![Spring](https://img.shields.io/badge/spring-%236DB33F.svg?style=for-the-badge&logo=spring&logoColor=white)
-![Clean Architecture](https://img.shields.io/badge/Architecture-Hexagonal-blue?style=for-the-badge)
-
-## 📝 Descrição
+##  Descrição
 
 Este projeto implementa um sistema robusto de processamento de transações financeiras entre contas. O objetivo principal foi refatorar e melhorar um código originalmente fornecido em um desafio técnico, aplicando boas práticas de engenharia de software, corrigindo problemas críticos de concorrência e organizando a arquitetura sob o padrão Hexagonal.
 
@@ -12,7 +8,7 @@ A aplicação simula transferências entre contas executadas de forma concorrent
 
 ---
 
-## 🔍 Problemas Identificados no Código Original
+##  Problemas Identificados no Código Original
 
 Durante a análise do código legado, foram identificados os seguintes gargalos técnicos:
 
@@ -23,7 +19,7 @@ Durante a análise do código legado, foram identificados os seguintes gargalos 
 
 ---
 
-## 🛠️ Melhorias Aplicadas
+##  Melhorias Aplicadas
 
 ### 1. Arquitetura Hexagonal (Ports and Adapters)
 O projeto foi reorganizado para separar as preocupações em camadas bem definidas:
@@ -53,22 +49,49 @@ Abaixo, a divisão clara de cada camada:
 
 ## 📁 Estrutura do Projeto
 
-```text
-src
-├── main
-│   └── java
-│       └── com.geovane.transacaofinanceira
-│           ├── adapters      # Entrada (Input) e Saída (Output)
-│           ├── application   # Serviços de aplicação
-│           ├── config        # Configurações de sistema
-│           ├── domain        # Modelos de domínio
-│           ├── ports         # Interfaces (Input/Output ports)
-│           └── Aplicacao.java # Classe principal
-└── test                      # Testes unitários e integrados
+```
+├── 📁 main
+│   └── 📁 java
+│       └── 📁 com.geovane.transacaofinanceira
+│           ├── 📁 adapters
+│           │   ├── 📁 input
+│           │   │   └── ☕ ExecutorTransacoes.java
+│           │   └── 📁 output
+│           │       └── ☕ RepositorioContaEmMemoria.java
+│           ├── 📁 application
+│           │   └── 📁 service
+│           │       └── ☕ ServicoTransacao.java
+│           ├── 📁 config
+│           │   ├── ☕ ConfiguracaoExecutor.java
+│           │   └── ☕ InicializadorDados.java
+│           ├── 📁 domain
+│           │   └── 📁 model
+│           │       ├── ☕ Conta.java
+│           │       └── ☕ Transacao.java
+│           ├── 📁 ports
+│           │   ├── 📁 input
+│           │   │   └── ☕ ExecutarTransacaoUseCase.java
+│           │   └── 📁 output
+│           │       └── ☕ ContaRepository.java
+│           └── ☕ Aplicacao.java
+└── 📁 test
+    └── 📁 java
+        └── 📁 com
+            └── 📁 geovane
+                └── 📁 transacaofinanceira
+                    ├── 📁 adapters
+                    │   ├── 📁 input
+                    │   └── 📁 output
+                    │       
+                    ├── 📁 application
+                    │   └── 📁 service
+                    │       
+                    ├── 📁 config
+                    └── 📁 model
 ```
 ---
 
-## 🚀 Tecnologias Utilizadas
+##  Tecnologias Utilizadas
 
 * **Java 17+**
 * **Spring Boot** (Gerenciamento de contexto e injeção de dependência)
@@ -91,8 +114,48 @@ src
    git clone <link-do-repositorio>
    cd transacao-financeira
 
-## 🚀 Como Executar
+##  Como Executar
 
 ### Executar via Maven
 ```bash
 mvn spring-boot:run
+```
+---
+
+## Fluxo de Execução
+Ao ser iniciada, a aplicação realiza automaticamente as seguintes etapas:
+* **Inicialização:** As contas são instanciadas em memória com seus respectivos saldos.
+* **Carga:** Carrega a lista de transações pendentes a serem processadas.
+* **Processamento:** Dispara as transferências de forma concorrente utilizando threads gerenciadas.
+* **Logging:** Registra detalhadamente o status final (sucesso ou motivo do erro) de cada operação diretamente no console.
+
+---
+
+## Validação e Integridade
+
+A robustez da solução é verificada através de testes automatizados e do fluxo de execução:
+
+* **JUnit:** Utilizado para validar as regras de negócio de forma isolada e garantir que a refatoração não alterou o comportamento esperado.
+* **Modelos de domínio:** Validam as regras de saldo insuficiente e transferências.
+* **Concorrência:** O sistema processa múltiplas transações simultâneas, validando se a integridade dos dados finais das contas permanece correta após a carga de estresse.
+
+
+### Para rodar os testes via terminal:
+
+```bash
+mvn test
+
+```
+
+---
+
+## 👨‍💻 Autor
+
+**Geovane**  
+Case Técnico - Itaú Unibanco
+
+---
+
+## 📄 Licença
+
+Este projeto foi desenvolvido para fins de avaliação técnica.
