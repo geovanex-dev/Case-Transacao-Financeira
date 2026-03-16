@@ -19,35 +19,32 @@ public class ServicoTransacao implements ExecutarTransacaoUseCase {
 
     @Override
     public void executar(Transacao transacao) {
+        try {
+            Conta origem = contaRepository.buscarPorId(transacao.getContaOrigem())
+                    .orElseThrow(() -> new RuntimeException("Conta origem não encontrada: " + transacao.getContaOrigem()));
 
-        Conta origem = contaRepository.buscarPorId(transacao.getContaOrigem())
-                .orElseThrow(() -> new RuntimeException("Conta origem não encontrada: " + transacao.getContaOrigem()));
+            Conta destino = contaRepository.buscarPorId(transacao.getContaDestino())
+                    .orElseThrow(() -> new RuntimeException("Conta destino não encontrada: " + transacao.getContaDestino()));
 
-        Conta destino = contaRepository.buscarPorId(transacao.getContaDestino())
-                .orElseThrow(() -> new RuntimeException("Conta destino não encontrada: " + transacao.getContaDestino()));
+            Conta primeira = origem.getId() < destino.getId() ? origem : destino;
+            Conta segunda = origem.getId() < destino.getId() ? destino : origem;
 
+            synchronized (primeira) {
+                synchronized (segunda) {
+                    if (origem.getSaldo().compareTo(transacao.getValor()) < 0) {
+                        log.warn("Transação {} cancelada: Saldo insuficiente na conta {}", transacao.getId(), origem.getId());
+                        return;
+                    }
 
-        Conta primeira = origem.getId() < destino.getId() ? origem : destino;
-        Conta segunda = origem.getId() < destino.getId() ? destino : origem;
+                    origem.debitar(transacao.getValor());
+                    destino.creditar(transacao.getValor());
 
-        synchronized (primeira) {
-            synchronized (segunda) {
-
-                if (origem.getSaldo().compareTo(transacao.getValor()) < 0) {
-                    log.warn("Transação {} cancelada por falta de saldo", transacao.getId());
-                    return;
+                    log.info("Transação {} executada com sucesso. Origem: {} Destino: {} Valor: {}",
+                            transacao.getId(), origem.getId(), destino.getId(), transacao.getValor());
                 }
-                origem.debitar(transacao.getValor());
-                destino.creditar(transacao.getValor());
-
-                log.info(
-                        "Transação {} executada com sucesso. Origem: {} Destino: {} Valor: {}",
-                        transacao.getId(),
-                        origem.getId(),
-                        destino.getId(),
-                        transacao.getValor()
-                );
             }
+        } catch (Exception e) {
+            log.error("Falha ao processar Transação {}: {}", transacao.getId(), e.getMessage());
         }
     }
 }
